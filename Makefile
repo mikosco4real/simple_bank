@@ -16,4 +16,10 @@ sqlc:
 test:
 	@go test -v -cover ./...
 
-.PHONY: createdb dropdb migrateup migratedown sqlc test
+build:
+	@go build -o bin/simple_bank
+
+run: build
+	@./bin/simple_bank
+
+.PHONY: createdb dropdb migrateup migratedown sqlc test build run
