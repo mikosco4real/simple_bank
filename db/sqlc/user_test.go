@@ -58,7 +58,7 @@ func TestUpdateUser(t *testing.T) {
 
 	arg := UpdateUserParams{
 		ID: user1.ID,
-		Firstname: user1.Firstname,
+		Email: user1.Email,
 	}
 
 	user2, err := testQueries.UpdateUser(context.Background(), arg)

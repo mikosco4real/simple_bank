@@ -31,6 +31,10 @@ func RandomString(n int, s string) string {
 	return sb.String()
 }
 
+func GenericRandomString(n int) string {
+	return RandomString(n, alphanumeric)
+}
+
 // RandomName generates a random (first/last) name
 func RandomName() string {
 	return strings.Title(RandomString(6, alphabet))

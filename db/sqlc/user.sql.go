@@ -80,6 +80,26 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 	return i, err
 }
 
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id, uuid, firstname, lastname, email, password, created_at FROM users
+WHERE email = $1 LIMIT 1
+`
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Uuid,
+		&i.Firstname,
+		&i.Lastname,
+		&i.Email,
+		&i.Password,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const listUsers = `-- name: ListUsers :many
 SELECT id, uuid, firstname, lastname, email, password, created_at FROM users 
 ORDER BY id
@@ -98,7 +118,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 		return nil, err
 	}
 	defer rows.Close()
-	var items []User
+	items := []User{}
 	for rows.Next() {
 		var i User
 		if err := rows.Scan(
@@ -125,18 +145,18 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 
 const updateUser = `-- name: UpdateUser :one
 UPDATE users
-SET firstname = $2
+SET email = $2
 WHERE id = $1
 RETURNING id, uuid, firstname, lastname, email, password, created_at
 `
 
 type UpdateUserParams struct {
-	ID        int64  `json:"id"`
-	Firstname string `json:"firstname"`
+	ID    int64  `json:"id"`
+	Email string `json:"email"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, updateUser, arg.ID, arg.Firstname)
+	row := q.db.QueryRowContext(ctx, updateUser, arg.ID, arg.Email)
 	var i User
 	err := row.Scan(
 		&i.ID,
