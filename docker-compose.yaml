@@ -1,0 +1,22 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15.2-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=4g3tm3n0t
+      - POSTGRES_DB=simplebank
+    container_name: db
+  api:
+    depends_on:
+      - db
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9100:9100"
+    environment:
+      - DB_SOURCE=postgresql://root:4g3tm3n0t@db:5432/simplebank?sslmode=disable
+    container_name: api
+    entrypoint: ["/app/wait-for.sh", "db:5432", "--", "/app/start.sh"]
+    command: ["/app/main"]
